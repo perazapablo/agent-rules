@@ -1,0 +1,11 @@
+# Line endings: LF siempre. Los .cjs llevan shebang y los .sh se ejecutan en
+# Linux — un CRLF ahi rompe el interprete ("bad interpreter: /usr/bin/env node^M").
+* text=auto eol=lf
+
+# Windows-only, puede quedar CRLF.
+*.ps1 text eol=crlf
+
+# Binarios: sin conversion.
+*.png binary
+*.ico binary
+*.exe binary
