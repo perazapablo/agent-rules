@@ -2,7 +2,7 @@
 name: harness
 description: Resuelve CWD → project_id al arrancar la sesión, exige focus antes de mutar, garantiza que toda sesión quede persistida, y gobierna las tareas bajo contrato de fases (exploration→planning→implementation→verification) con gates verificables.
 trigger: SessionStart / equivalente (cualquier cliente que soporte hooks)
-agents: [claude, opencode]
+agents: [claude, opencode, omp]
 enforced_by:
   - hooks/claude-session-start.cjs (SessionStart, Claude Code)
   - hooks/claude-focus-gate.cjs (PreToolUse mcp__memory__*, Claude Code)
@@ -12,6 +12,7 @@ enforced_by:
   - /home/joel/.config/mcp-learning/harness/phase-gate.cjs (PreToolUse Write|Edit|NotebookEdit|mcp__memory__decision_record, Claude Code)
   - /home/joel/.config/mcp-learning/harness/session-end.cjs (SessionEnd, Claude Code)
   - ../../../opencode/plugins/harness.ts (opencode, todos los eventos)
+  - hooks/omp-harness.ts (omp/oh-my-pi, extensión; todos los eventos)
 depends_on: [memory-protocol, action-gating]
 ---
 
@@ -39,21 +40,27 @@ Core agnóstico en `mcp-learning/harness/` (lee la DB del MCP con `node:sqlite`,
 
 ## Paridad de adapters
 
-| Responsabilidad | Claude Code | opencode |
-|---|---|---|
-| Inyectar contexto de arranque | `claude-session-start.cjs` (SessionStart) | `experimental.chat.system.transform` |
-| Contar turnos + focus provisional | `claude-user-prompt.cjs` (UserPromptSubmit) | `chat.message` |
-| Registrar enmiendas de scope | `phase-post.cjs` (PostToolUse) | — (pendiente de portar) |
-| Focus-gate sobre writes de MCP | `claude-focus-gate.cjs` (PreToolUse `mcp__memory__.*`) → `deny` | `tool.execute.before` → `throw` |
-| Mutation-gate sobre Edit/Write/Bash | `claude-edit-focus-gate.cjs` (PreToolUse) → `deny` | `tool.execute.before` → `throw` |
-| SessionStats | `claude-post-tool.cjs` (PostToolUse `.*`) | `tool.execute.after` |
-| Auto-save de la sesión | `session-end.cjs` (SessionEnd) | `event: session.idle`, `autoSave({quiet:true})` |
+| Responsabilidad | Claude Code | opencode | omp |
+|---|---|---|---|
+| Inyectar contexto de arranque | `claude-session-start.cjs` (SessionStart) | `experimental.chat.system.transform` | `before_agent_start` → `{message}`, una vez por sesión raíz |
+| Contar turnos + focus provisional | `claude-user-prompt.cjs` (UserPromptSubmit) | `chat.message` | `before_agent_start` (trae `prompt`) |
+| Registrar enmiendas de scope | `phase-post.cjs` (PostToolUse) | — (pendiente de portar) | `tool_result` → spawn de `phase-post.cjs`, sólo si el humano confirmó |
+| Focus-gate sobre writes de MCP | `claude-focus-gate.cjs` (PreToolUse `mcp__memory__.*`) → `deny` | `tool.execute.before` → `throw` | `tool_call` → `{block:true}` |
+| Mutation-gate sobre Edit/Write/Bash | `claude-edit-focus-gate.cjs` (PreToolUse) → `deny` | `tool.execute.before` → `throw` | `tool_call` → `{block:true}` |
+| SessionStats | `claude-post-tool.cjs` (PostToolUse `.*`) | `tool.execute.after` | `tool_result` (trae `isError`) |
+| Auto-save de la sesión | `session-end.cjs` (SessionEnd) | `event: session.idle`, `autoSave({quiet:true})` | `session_shutdown`, `autoSave({quiet:true})` |
+| `ask` del gate de fases | emite la pregunta y muere (por eso existe `phase-post`) | ✗ | `await ctx.ui.confirm()` — la respuesta vuelve al handler |
 
 Diferencias irreducibles:
 
 - opencode no expone fin de sesión, sólo `session.idle`. El auto-save corre en cada idle: es idempotente (saltea si hay narrativa del modelo, saltea si no hay señal) y llena el timeline progresivamente. Los markers `.missed-checkpoint` que quedan obsoletos porque el modelo cerró después los retira `session-context.cjs` al drenar.
 - opencode no reporta errores de tool en `tool.execute.after`, así que `tool_errors` no se incrementa ahí.
 - opencode normaliza nombres en la frontera: `bash|edit|write|patch` → `Bash|Edit|Write`, `memory_<tool>` → `mcp__memory__<tool>`, `filePath` → `file_path`. En el SDK 1.4.x los args de `tool.execute.before` llegan en `output.args`, no en `input`.
+- omp es **fail-closed**: un handler que tira BLOQUEA el tool. El core es fail-open. Cada handler de `omp-harness.ts` va envuelto en `try/catch` que devuelve `undefined`; sacarlo invierte la filosofía del core.
+- omp le da a cada **subagente** (`task`) un `session_id` propio, pero carga la misma extensión y emite sus `tool_call`. El adapter colapsa esas sesiones sobre la raíz leyendo el path del transcript (`<padre>/<Nombre>.jsonl`): sin eso cada subagente arrancaría sin focus y el mutation-gate le bloquearía todo.
+- omp expone las tools MCP **también** como devices: `write` con `path: "xd://mcp__memory_add_note"` y los args JSON en `content`. El adapter desenvuelve ese caso; tratarlo como un `Write` común deja el focus-gate ciego a toda escritura en memoria.
+- Sin UI (`-p`, headless) `ctx.ui.confirm()` no existe: el veredicto `ask` del gate de fases pasa (fail-open, como el core) y **no** se registra enmienda — no hubo humano que aprobara.
+- Nombres MCP en omp: `mcp__<server>_<tool>` con **un** underscore (`mcp__memory_set_focus`), no los dos de Claude Code. La normalización es obligatoria: sin ella `requiresFocus()` devuelve `false` para todo y el focus-gate queda desarmado en silencio.
 
 Tool MCP `get_session_stats(session_id, project_id?)` — lee el state file y devuelve snapshot enriquecido (`duration_min` desde `started_at_ms`, `last_focus` desde `session_focus`).
 
