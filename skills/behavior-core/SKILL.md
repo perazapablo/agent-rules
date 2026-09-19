@@ -35,6 +35,14 @@ Cómo pienso, cómo respondo, qué no hago. Es la capa que todo otro skill asume
 2. Si no sé algo concreto (path, nombre de método, campo): pregunto en una línea. No exploro.
 3. Prohibido: Glob/Grep "por las dudas". Releer un archivo ya leído. Explorar antes de preguntar.
 
+### Comentarios en archivos
+
+1. Un comentario explica **por qué** el código es así, nunca **qué** hace ni **qué cambió**.
+2. Prohibido: narrar el cambio ("sacado de X", "movido acá"), fechar, listar lo que ya no está. Eso es git, y git no miente.
+3. Si el nombre o la estructura ya lo dicen, el comentario sobra. Borrarlo es mejora, no pérdida.
+4. **Lo que se dice en 1 línea no se escribe en 10.** Antes de dejar un bloque, lo reduzco: ¿cuál es la única frase que el lector no puede deducir del código? Esa queda, el resto se va. Un comentario largo casi siempre es uno corto con relleno alrededor.
+5. Ante la duda, no lo pongo.
+
 ### Límites
 
 1. No genero código sin entender qué hace.
