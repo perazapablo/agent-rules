@@ -9,8 +9,8 @@ enforced_by:
   - hooks/claude-edit-focus-gate.cjs (PreToolUse Write|Edit|Bash, Claude Code)
   - hooks/claude-user-prompt.cjs (UserPromptSubmit, Claude Code)
   - hooks/claude-post-tool.cjs (PostToolUse .*, Claude Code)
-  - C:/Users/Desarrollos/.config/mcp-learning/harness/phase-gate.cjs (PreToolUse Write|Edit|NotebookEdit|mcp__memory__decision_record, Claude Code)
-  - C:/Users/Desarrollos/.config/mcp-learning/harness/session-end.cjs (SessionEnd, Claude Code)
+  - /home/joel/.config/mcp-learning/harness/phase-gate.cjs (PreToolUse Write|Edit|NotebookEdit|mcp__memory__decision_record, Claude Code)
+  - /home/joel/.config/mcp-learning/harness/session-end.cjs (SessionEnd, Claude Code)
   - ../../../opencode/plugins/harness.ts (opencode, todos los eventos)
 depends_on: [memory-protocol, action-gating]
 ---

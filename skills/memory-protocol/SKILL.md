@@ -121,5 +121,5 @@ Regla operativa: antes de meter algo en `pending` o `blockers`, preguntar: "¿es
 
 ## Referencias
 
-- Protocolo extendido y casos borde: `C:/Users/Desarrollos/.config/mcp-learning/MEMORY_PROTOCOL.md`.
-- Reglas operativas complementarias: `C:/Users/Desarrollos/.config/mcp-learning/MEMORY_RULES.md`.
+- Protocolo extendido y casos borde: `/home/joel/.config/mcp-learning/MEMORY_PROTOCOL.md`.
+- Reglas operativas complementarias: `/home/joel/.config/mcp-learning/MEMORY_RULES.md`.

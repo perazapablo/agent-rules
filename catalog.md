@@ -9,7 +9,7 @@
 - `memory-protocol` — MCP memory tools — hook (claude, opencode)
 - `harness` — SessionStart+PreToolUse+PostToolUse+UserPromptSubmit: mapper CWD→project_id, focus-gate, SessionStats — hook (claude, opencode)
 
-## Producto / interfaz
+## Producto / interfaz (on-demand)
 
 - `interfaz-iterativa` — al diseñar, construir o modificar una pantalla que usa una persona — sin hook
 
@@ -37,14 +37,11 @@ Inyectadas por el Orchestrator en el mensaje de delegación al Executor:
 
 Fuente: `vendor/mattpocock-skills/` (junctions en `skills/`). Update con `git pull` en el vendor.
 
-Always-on (importados en `RULES.md`):
+On-demand (no importados, se cargan al invocarse):
 
 - `grill-me` — user escribe `/grill-me` o "grill me" — sin hook
 - `grilling` — target de grill-me — sin hook
 - `codebase-design` — al diseñar módulos/interfaces/seams — sin hook
-
-On-demand (no importados, se cargan al invocarse):
-
 - `to-spec` — user escribe `/to-spec` para convertir conversación en PRD — sin hook
   - Override MCP: `skills/to-spec.override.md` (persiste en MCP memory además del tracker)
 - `diagnosing-bugs` — model-invoked ante "debug"/"diagnose"/"no anda"/"está lento" — sin hook

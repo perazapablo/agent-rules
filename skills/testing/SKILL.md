@@ -177,4 +177,4 @@ Este archivo es la fuente de verdad del proyecto. Si contradice esta skill, gana
 
 - Matrix de tools: [`tools-matrix.md`](tools-matrix.md)
 - Patterns por categoría: [`patterns/`](patterns/)
-- Rules universales complementarias: `C:/Users/Desarrollos/.config/agent-rules/skills/behavior-core/SKILL.md`
+- Rules universales complementarias: `/home/joel/.config/agent-rules/skills/behavior-core/SKILL.md`

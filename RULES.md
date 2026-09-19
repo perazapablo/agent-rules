@@ -1,13 +1,7 @@
-@C:/Users/Desarrollos/.config/agent-rules/skills/behavior-core/SKILL.md
-@C:/Users/Desarrollos/.config/agent-rules/skills/action-gating/SKILL.md
-@C:/Users/Desarrollos/.config/agent-rules/skills/memory-protocol/SKILL.md
-@C:/Users/Desarrollos/.config/agent-rules/skills/harness/SKILL.md
-@C:/Users/Desarrollos/.config/agent-rules/skills/interfaz-iterativa/SKILL.md
-
-<!-- vendor: mattpocock-skills (always-on) -->
-@C:/Users/Desarrollos/.config/agent-rules/skills/grill-me/SKILL.md
-@C:/Users/Desarrollos/.config/agent-rules/skills/grilling/SKILL.md
-@C:/Users/Desarrollos/.config/agent-rules/skills/codebase-design/SKILL.md
+@/home/joel/.config/agent-rules/skills/behavior-core/SKILL.md
+@/home/joel/.config/agent-rules/skills/action-gating/SKILL.md
+@/home/joel/.config/agent-rules/skills/memory-protocol/SKILL.md
+@/home/joel/.config/agent-rules/skills/harness/SKILL.md
 
 ---
 
